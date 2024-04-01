@@ -52,10 +52,10 @@ public class UrlService {
 
     @Transactional(readOnly = true) // тут методи тільки читають з бази
     public List<UrlStatDTO> getStatistics() {
-        var records = urlRepository.findAll();
-        var result = new ArrayList<UrlStatDTO>();
+        var records = urlRepository.findAll(); // витягаємо всі записи з репо
+        var result = new ArrayList<UrlStatDTO>(); // з листа ентеті створюємо лист дто
 
-        records.forEach(x -> result.add(x.toStatDTO()));
+        records.forEach(x -> result.add(x.toStatDTO())); // конвертуе в дто
 
         return result;
     }

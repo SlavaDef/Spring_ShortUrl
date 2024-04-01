@@ -70,18 +70,18 @@ public class UrlController {
     }
 
     /*
-        302
+        302 - це перенаправлення користувача на іншу сторінку
         Location: https://goto.com
         Cache-Control: no-cache, no-store, must-revalidate
      */
 
-    @GetMapping("my/{id}")
+    @GetMapping("my/{id}") // беремо цю частину адреси і конвертуємо її в лонг
     public ResponseEntity<Void> redirect(@PathVariable("id") Long id) {
-        String url = urlService.getUrl(id);
+        String url = urlService.getUrl(id); // за id витягаємо повні данні тут довгий юрл
 
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(url));
-        headers.setCacheControl("no-cache, no-store, must-revalidate");
+        headers.setCacheControl("no-cache, no-store, must-revalidate"); // це відрубити кушування в браузері
 
         return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }

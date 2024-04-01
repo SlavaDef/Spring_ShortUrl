@@ -22,4 +22,5 @@ public class UrlStatDTO extends UrlResultDTO{
     public void setLastAccess(Date lastAccess) {
         this.lastAccess = lastAccess;
     }
+
 }

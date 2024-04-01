@@ -72,7 +72,7 @@ public class UrlRecord {
     public UrlStatDTO toStatDTO() {
         var result = new UrlStatDTO();
 
-        result.setUrl(url);
+        result.setUrl(url); // копіюємо довгий url
         result.setShortUrl(Long.toString(id));
         result.setRedirects(count);
         result.setLastAccess(lastAccess);

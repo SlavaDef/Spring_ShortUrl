@@ -28,7 +28,7 @@ public class UrlService {
     @Transactional
     // ініціалізується транзакція - виконується код якщо ексепшена нема то транзакція комит якщо є відкатується
     public long saveUrl(UrlDTO urlDTO) {
-        var urlRecord = urlRepository.findByUrl(urlDTO.getUrl()); // за довгим урл знайди запис в таблиці чи скорочували ми вже його
+        UrlRecord urlRecord = urlRepository.findByUrl(urlDTO.getUrl()); // за довгим урл знайди запис в таблиці чи скорочували ми вже його
         if (urlRecord == null) { // якщо такого нема то це новий
             urlRecord = UrlRecord.of(urlDTO); // копіюємо в дто обьект і зберігаємо в базу
             urlRepository.save(urlRecord);
@@ -43,7 +43,7 @@ public class UrlService {
         if (urlOpt.isEmpty())
             return null;
 
-        var urlRecord = urlOpt.get(); // отримали цей обьект
+        UrlRecord urlRecord = urlOpt.get(); // отримали цей обьект
         urlRecord.setCount(urlRecord.getCount() + 1); // збільшиои його каунт на 1
         urlRecord.setLastAccess(new Date()); // встановили останню дату перегляду
 

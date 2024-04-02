@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -39,8 +40,9 @@ public class UrlService {
     }
 
     @Transactional // завдяки цьому автокоміту всі зміни будеть показуватися в базі
-    public String getUrl(long id) { // тут навпаки по id хочу отримати довгий урл повертає опшинал(обькт) за id
-        var urlOpt = urlRepository.findById(id);
+   // public String getUrl(long id) { // тут навпаки по id хочу отримати довгий урл повертає опшинал(обькт) за id
+    public String getUrl(String link) {
+        Optional<UrlRecord> urlOpt = urlRepository.findByLink(link);
         if (urlOpt.isEmpty())
             return null;
 
@@ -71,7 +73,7 @@ public class UrlService {
             urlRepository.save(urlRecord);
         }
         if (urlRecord.getUrl().length() > 15) {
-            return urlRecord.getUrl().substring(0, urlRecord.getUrl().length() / 3);
+            return getRandomString(7);
         }
         return urlRecord.getUrl();
     }
@@ -80,7 +82,7 @@ public class UrlService {
        return urlRepository.findAll();
     }
 
-    public static String getRandomString(int l) {
+    public String getRandomString(int l) {
         String AlphaNumericStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvxyz";
         StringBuilder s = new StringBuilder(l);
         for (int i = 0; i < l; i++) {

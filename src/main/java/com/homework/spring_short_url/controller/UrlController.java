@@ -26,19 +26,7 @@ public class UrlController {
         return " Hello dear user";
     }
 
-    @GetMapping("shorten_simple2")
-    public UrlResultDTO shorten2(@RequestParam String url) { // Jackson / GSON сюди приходить в метод
-        UrlDTO urlDTO = new UrlDTO(); // create urlDTO
-        urlDTO.setUrl(url); // передаємо який юрл треба скоротити
 
-        String id = urlService.saveUrl2(urlDTO); // зберігаємо дтошку в базі
-
-        UrlResultDTO result = new UrlResultDTO(); // новий обьект вже іншої дтошки
-        result.setUrl(urlDTO.getUrl()); // першому полю встановили значення що передавав юзер
-        result.setShortUrl(id); // другому полю передали id
-// в рест контроллері при повернені обьекту він автоматично серіалізується в джейсон формат
-        return result; // повертаємо id збереженого обьекту чи іншу дтошку з двома обьектами
-    }
 
     // postmen
     // http://localhost:8080/shorten_simple?url=https://bank.gov.ua/NBUStatService/v1/statdirectory/exchange?valcode=EUR&date=20240101&json
@@ -48,11 +36,13 @@ public class UrlController {
         UrlDTO urlDTO = new UrlDTO(); // create urlDTO
         urlDTO.setUrl(url); // передаємо який юрл треба скоротити
 
-        long id = urlService.saveUrl(urlDTO); // зберігаємо дтошку в базі
+       // long id =
+                urlService.saveUrl(urlDTO); // зберігаємо дтошку в базі
 
-        var result = new UrlResultDTO(); // новий обьект вже іншої дтошки
+        UrlResultDTO result = new UrlResultDTO(); // новий обьект вже іншої дтошки
         result.setUrl(urlDTO.getUrl()); // першому полю встановили значення що передавав юзер
-        result.setShortUrl(Long.toString(id)); // другому полю передали id
+       // result.setShortUrl(Long.toString(id)); // другому полю передали id
+        result.setShortUrl(urlService.getRandomString(7));
 // в рест контроллері при повернені обьекту він автоматично серіалізується в джейсон формат
         return result; // повертаємо id збереженого обьекту чи іншу дтошку з двома обьектами
     }
@@ -75,7 +65,7 @@ public class UrlController {
         Cache-Control: no-cache, no-store, must-revalidate
      */
 
-    @GetMapping("my/{id}") // беремо цю частину адреси і конвертуємо її в лонг
+   /* @GetMapping("my/{id}") // беремо цю частину адреси і конвертуємо її в лонг
     public ResponseEntity<Void> redirect(@PathVariable("id") Long id) {
         String url = urlService.getUrl(id); // за id витягаємо повні данні тут довгий юрл
 
@@ -84,7 +74,19 @@ public class UrlController {
         headers.setCacheControl("no-cache, no-store, must-revalidate"); // це відрубити кушування в браузері
 
         return new ResponseEntity<>(headers, HttpStatus.FOUND);
+    } */
+
+    @GetMapping("my/{link}") // беремо цю частину адреси і конвертуємо її в лонг
+    public ResponseEntity<Void> redirect(@PathVariable("link") String link) {
+        String url = urlService.getUrl(link); // за id витягаємо повні данні тут довгий юрл
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(url));
+        headers.setCacheControl("no-cache, no-store, must-revalidate"); // це відрубити кушування в браузері
+
+        return new ResponseEntity<>(headers, HttpStatus.FOUND);
     }
+
 
     @GetMapping("stat")
     public List<UrlStatDTO> stat() {
@@ -94,5 +96,19 @@ public class UrlController {
     @GetMapping("getAll")
     public List<UrlRecord> all(){
         return urlService.listAll();
+    }
+
+    @GetMapping("shorten_simple2")
+    public UrlResultDTO shorten2(@RequestParam String url) { // Jackson / GSON сюди приходить в метод
+        UrlDTO urlDTO = new UrlDTO(); // create urlDTO
+        urlDTO.setUrl(url); // передаємо який юрл треба скоротити
+
+        String id = urlService.saveUrl2(urlDTO); // зберігаємо дтошку в базі
+
+        UrlResultDTO result = new UrlResultDTO(); // новий обьект вже іншої дтошки
+        result.setUrl(urlDTO.getUrl()); // першому полю встановили значення що передавав юзер
+        result.setShortUrl(id); // другому полю передали id
+// в рест контроллері при повернені обьекту він автоматично серіалізується в джейсон формат
+        return result; // повертаємо id збереженого обьекту чи іншу дтошку з двома обьектами
     }
 }

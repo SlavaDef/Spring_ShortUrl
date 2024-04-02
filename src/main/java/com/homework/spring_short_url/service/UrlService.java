@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 // DB -> Enteti(20) -> Repo -> Service -> DTO <- Controller -> View / JSON (5)
@@ -77,6 +78,15 @@ public class UrlService {
 
     public List<UrlRecord> listAll(){
        return urlRepository.findAll();
+    }
+
+    public static String getRandomString(int l) {
+        String AlphaNumericStr = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvxyz";
+        StringBuilder s = new StringBuilder(l);
+        for (int i = 0; i < l; i++) {
+            s.append(AlphaNumericStr.charAt(ThreadLocalRandom.current().nextInt(AlphaNumericStr.length())));
+        }
+        return s.toString();
     }
 
 }

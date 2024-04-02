@@ -1,26 +1,17 @@
 package com.homework.spring_short_url.dto;
 
-import java.util.Date;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.time.LocalDateTime;
+
+
+@Getter
+@Setter
 public class UrlStatDTO extends UrlResultDTO{
 
     private long redirects;
-    private Date lastAccess; // TODO: set normal format
+    private LocalDateTime lastAccess; // TODO: set normal format
 
-    public long getRedirects() {
-        return redirects;
-    }
-
-    public void setRedirects(long redirects) {
-        this.redirects = redirects;
-    }
-
-    public Date getLastAccess() {
-        return lastAccess;
-    }
-
-    public void setLastAccess(Date lastAccess) {
-        this.lastAccess = lastAccess;
-    }
 
 }

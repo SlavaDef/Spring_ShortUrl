@@ -4,9 +4,11 @@ import com.homework.spring_short_url.dto.UrlDTO;
 import com.homework.spring_short_url.dto.UrlStatDTO;
 import com.homework.spring_short_url.models.UrlRecord;
 import com.homework.spring_short_url.repo.UrlRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -15,15 +17,13 @@ import java.util.List;
 // DB -> Enteti(20) -> Repo -> Service -> DTO <- Controller -> View / JSON (5)
 // ідея наступна - не завжди треба всі поля ентеті, тому поля конвертують у дто а з них вже у контроллер
 //  дто це звичайні класи в які ми копіюємо данні з ентеті які нам потрібні
+@AllArgsConstructor
 @Service // анотація похідна від компоненту в рантаймі створюється автоматично реалізує логіку по верх репозитирія
 public class UrlService {
 
     private final UrlRepository urlRepository;
 // через конструктор інжект репозіторій з усіма методами
 
-    public UrlService(UrlRepository urlRepository) {
-        this.urlRepository = urlRepository;
-    }
 
     @Transactional
     // ініціалізується транзакція - виконується код якщо ексепшена нема то транзакція комит якщо є відкатується
@@ -45,15 +45,15 @@ public class UrlService {
 
         UrlRecord urlRecord = urlOpt.get(); // отримали цей обьект
         urlRecord.setCount(urlRecord.getCount() + 1); // збільшиои його каунт на 1
-        urlRecord.setLastAccess(new Date()); // встановили останню дату перегляду
+        urlRecord.setLastAccess(LocalDateTime.now()); // встановили останню дату перегляду
 
         return urlRecord.getUrl(); // повертаємо це довге посилання
     }
 
     @Transactional(readOnly = true) // тут методи тільки читають з бази
     public List<UrlStatDTO> getStatistics() {
-        var records = urlRepository.findAll(); // витягаємо всі записи з репо
-        var result = new ArrayList<UrlStatDTO>(); // з листа ентеті створюємо лист дто
+        List<UrlRecord> records = urlRepository.findAll(); // витягаємо всі записи з репо
+        ArrayList<UrlStatDTO> result = new ArrayList<UrlStatDTO>(); // з листа ентеті створюємо лист дто
 
         records.forEach(x -> result.add(x.toStatDTO())); // конвертуе в дто
 
@@ -73,6 +73,10 @@ public class UrlService {
             return urlRecord.getUrl().substring(0, urlRecord.getUrl().length() / 3);
         }
         return urlRecord.getUrl();
+    }
+
+    public List<UrlRecord> listAll(){
+       return urlRepository.findAll();
     }
 
 }

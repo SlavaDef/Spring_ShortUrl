@@ -3,7 +3,9 @@ package com.homework.spring_short_url.controller;
 import com.homework.spring_short_url.dto.UrlDTO;
 import com.homework.spring_short_url.dto.UrlResultDTO;
 import com.homework.spring_short_url.dto.UrlStatDTO;
+import com.homework.spring_short_url.models.UrlRecord;
 import com.homework.spring_short_url.service.UrlService;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,14 +14,12 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.List;
 
+@AllArgsConstructor
 @RestController
 public class UrlController {
 
     private final UrlService urlService; // інжектимо сервіс
 
-    public UrlController(UrlService urlService) {
-        this.urlService = urlService;
-    }
 
     @GetMapping("/")
     public String hello(){
@@ -89,5 +89,10 @@ public class UrlController {
     @GetMapping("stat")
     public List<UrlStatDTO> stat() {
         return urlService.getStatistics();
+    }
+
+    @GetMapping("getAll")
+    public List<UrlRecord> all(){
+        return urlService.listAll();
     }
 }

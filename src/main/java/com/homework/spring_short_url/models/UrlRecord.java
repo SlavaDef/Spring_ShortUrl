@@ -1,11 +1,21 @@
 package com.homework.spring_short_url.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.homework.spring_short_url.dto.UrlDTO;
 import com.homework.spring_short_url.dto.UrlStatDTO;
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
+@Setter
+@Getter
 @Entity
 public class UrlRecord {
     @Id
@@ -19,12 +29,15 @@ public class UrlRecord {
     private Long count;
 
     @Temporal(value = TemporalType.TIMESTAMP) // каже базі як зберігати дату в базі - тільки час тільки дату чи все
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm")
+    @JsonDeserialize(using = LocalDateTimeDeserializer.class)
+    @JsonSerialize(using = LocalDateTimeSerializer.class)
     @Column(nullable = false)
-    private Date lastAccess;
+    private LocalDateTime lastAccess;
 
     public UrlRecord() { // в конструкторах ініціалізуємо певні значення за замовчуванням
         count = 0L;
-        lastAccess = new Date();
+        lastAccess = LocalDateTime.now();
     }
 
     public UrlRecord(String url) {
@@ -37,40 +50,9 @@ public class UrlRecord {
         return new UrlRecord(urlDTO.getUrl());
     }
 
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public Long getCount() {
-        return count;
-    }
-
-    public void setCount(Long count) {
-        this.count = count;
-    }
-
-    public Date getLastAccess() {
-        return lastAccess;
-    }
-
-    public void setLastAccess(Date lastAccess) {
-        this.lastAccess = lastAccess;
-    }
 
     public UrlStatDTO toStatDTO() {
-        var result = new UrlStatDTO();
+        UrlStatDTO result = new UrlStatDTO();
 
         result.setUrl(url); // копіюємо довгий url
         result.setShortUrl(Long.toString(id));

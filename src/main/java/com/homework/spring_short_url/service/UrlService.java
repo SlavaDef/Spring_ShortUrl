@@ -1,10 +1,14 @@
 package com.homework.spring_short_url.service;
 
+import com.homework.spring_short_url.controller.UrlController;
 import com.homework.spring_short_url.dto.UrlDTO;
+import com.homework.spring_short_url.dto.UrlResultDTO;
 import com.homework.spring_short_url.dto.UrlStatDTO;
 import com.homework.spring_short_url.models.UrlRecord;
 import com.homework.spring_short_url.repo.UrlRepository;
 import lombok.AllArgsConstructor;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +27,8 @@ import java.util.concurrent.ThreadLocalRandom;
 @Service // анотація похідна від компоненту в рантаймі створюється автоматично реалізує логіку по верх репозитирія
 public class UrlService {
 
+    private static final Logger LOGGER = LogManager.getLogger(UrlController.class);
+
     private final UrlRepository urlRepository;
 // через конструктор інжект репозіторій з усіма методами
 
@@ -32,22 +38,30 @@ public class UrlService {
     public long saveUrl(UrlDTO urlDTO) {
         UrlRecord urlRecord = urlRepository.findByUrl(urlDTO.getUrl()); // за довгим урл знайди запис в таблиці чи скорочували ми вже його
         if (urlRecord == null) { // якщо такого нема то це новий
-            urlRecord = UrlRecord.of(urlDTO); // копіюємо в дто обьект і зберігаємо в базу
+            urlRecord = UrlRecord.of(urlDTO); // копіюємо в дто обьект і зберігаємо в базу запамятовуємо введений урл
+            LOGGER.info("urlRecordUrl = " + urlRecord.getUrl()); // довге посилання
+            LOGGER.info("urlRecordAccess = " + urlRecord.getLastAccess());
+            LOGGER.info("urlRecordId = " + urlRecord.getId()); // null
             urlRepository.save(urlRecord);
         }
+        LOGGER.info("urlRecordUrl = " + urlRecord.getUrl()); // довге посилання
+        LOGGER.info("urlRecordAccess = " + urlRecord.getLastAccess());
+        LOGGER.info("urlRecordId = " + urlRecord.getId()); // 1
 // присвоєний id використовуємо як унік індефікатор для короткого посилання
         return urlRecord.getId(); // зберігаємо айди
     }
 
     @Transactional // завдяки цьому автокоміту всі зміни будеть показуватися в базі
-   // public String getUrl(long id) { // тут навпаки по id хочу отримати довгий урл повертає опшинал(обькт) за id
-    public String getUrl(String link) {
-        Optional<UrlRecord> urlOpt = urlRepository.findByLink(link);
+    public String getUrl(long id) { // тут навпаки по id хочу отримати довгий урл повертає опшинал(обькт) за id
+  //  public String getUrl(String link) {
+        Optional <UrlRecord>urlOpt = urlRepository.findById(id);
+
+        //  Optional <UrlRecord>urlOpt = urlRepository.findByLink(link);
         if (urlOpt.isEmpty())
             return null;
 
         UrlRecord urlRecord = urlOpt.get(); // отримали цей обьект
-        urlRecord.setCount(urlRecord.getCount() + 1); // збільшиои його каунт на 1
+        urlRecord.setCount(urlRecord.getCount() + 1L); // збільшиои його каунт на 1
         urlRecord.setLastAccess(LocalDateTime.now()); // встановили останню дату перегляду
 
         return urlRecord.getUrl(); // повертаємо це довге посилання

@@ -14,7 +14,7 @@ public interface UrlRepository extends JpaRepository<UrlRecord, Long> {
     // якщо вірно назвати то данний метод спрінг рахує як урл ( String url - парами запиту)
 
 
-   // ExchangeCourse courseByDate(@Param("exchangedate") LocalDate date);
-    @Query(value = "from UrlRecord e where e.url = :url")
+
+    @Query(value = "from UrlRecord e where e.shortUrl = :shortUrl")
     Optional<UrlRecord> findByLink(@Param("url") String url);
 }

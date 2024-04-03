@@ -52,10 +52,10 @@ public class UrlService {
     }
 
     @Transactional // завдяки цьому автокоміту всі зміни будеть показуватися в базі
-    public String getUrl(long id) { // тут навпаки по id хочу отримати довгий урл повертає опшинал(обькт) за id
-  //  public String getUrl(String link) {
-        Optional <UrlRecord>urlOpt = urlRepository.findById(id);
-
+    //   public String getUrl(long id) { // тут навпаки по id хочу отримати довгий урл повертає опшинал(обькт) за id
+    public String getUrl(String link) {
+        Optional<UrlRecord> urlOpt = urlRepository.findByLink(link);
+    //    LOGGER.info("findByLink = " + urlOpt.get().getShortUrl());
         //  Optional <UrlRecord>urlOpt = urlRepository.findByLink(link);
         if (urlOpt.isEmpty())
             return null;
@@ -80,20 +80,15 @@ public class UrlService {
 
     // ініціалізується транзакція - виконується код якщо ексепшена нема то транзакція комит якщо є відкатується
     @Transactional
-    public String saveUrl2(UrlDTO urlDTO) {
-        UrlRecord urlRecord = urlRepository.findByUrl(urlDTO.getUrl()); // за довгим урл знайди запис в таблиці чи скорочували ми вже його
-        if (urlRecord == null) { // якщо такого нема то це новий
-            urlRecord = UrlRecord.of(urlDTO); // копіюємо в дто обьект і зберігаємо в базу
-            urlRepository.save(urlRecord);
-        }
-        if (urlRecord.getUrl().length() > 15) {
-            return getRandomString(7);
-        }
-        return urlRecord.getUrl();
+    public UrlRecord saveUrl2() {
+        UrlDTO urlDTO = new UrlDTO();
+        UrlRecord urlRecord = UrlRecord.of(urlDTO);
+        urlRepository.save(urlRecord);
+        return urlRecord;
     }
 
-    public List<UrlRecord> listAll(){
-       return urlRepository.findAll();
+    public List<UrlRecord> listAll() {
+        return urlRepository.findAll();
     }
 
     public String getRandomString(int l) {

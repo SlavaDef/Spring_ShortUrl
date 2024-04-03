@@ -4,6 +4,7 @@ import com.homework.spring_short_url.dto.UrlDTO;
 import com.homework.spring_short_url.dto.UrlResultDTO;
 import com.homework.spring_short_url.dto.UrlStatDTO;
 import com.homework.spring_short_url.models.UrlRecord;
+import com.homework.spring_short_url.repo.UrlRepository;
 import com.homework.spring_short_url.service.UrlService;
 import lombok.AllArgsConstructor;
 import org.apache.logging.log4j.LogManager;
@@ -23,6 +24,7 @@ public class UrlController {
     private static final Logger LOGGER = LogManager.getLogger(UrlController.class);
 
     private final UrlService urlService; // інжектимо сервіс
+    private final UrlRepository urlRepository;
 
 
     @GetMapping("/")
@@ -68,7 +70,7 @@ public class UrlController {
         Cache-Control: no-cache, no-store, must-revalidate
      */
 
-     @GetMapping("my/{id}") // беремо цю частину адреси і конвертуємо її в лонг
+   /*  @GetMapping("my/{id}") // беремо цю частину адреси і конвертуємо її в лонг
     public ResponseEntity<Void> redirect(@PathVariable("id") Long id) {
         String url = urlService.getUrl(id); // за id витягаємо повні данні тут довгий юрл
         LOGGER.info("url = " + url);
@@ -77,19 +79,20 @@ public class UrlController {
         headers.setCacheControl("no-cache, no-store, must-revalidate"); // це відрубити кушування в браузері
 
         return new ResponseEntity<>(headers, HttpStatus.FOUND);
-    }
+    } */
 
-    /*   @GetMapping("my/{link}") // беремо цю частину адреси і конвертуємо її в лонг
-    public ResponseEntity<Void> redirect(@PathVariable("link") String link) {
+       @GetMapping("my/{link}") // беремо цю частину адреси і конвертуємо її в лонг
+    public ResponseEntity<Void> redirect2(@PathVariable("link") String link) {
 
         String url = urlService.getUrl(link); // за id витягаємо повні данні тут довгий юрл
+
         LOGGER.info("url = "+ url);
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(url));
         headers.setCacheControl("no-cache, no-store, must-revalidate"); // це відрубити кушування в браузері
 
         return new ResponseEntity<>(headers, HttpStatus.FOUND);
-    }  */
+    }
 
 
     @GetMapping("stat")
@@ -104,15 +107,16 @@ public class UrlController {
 
     @GetMapping("shorten_simple2")
     public UrlResultDTO shorten2(@RequestParam String url) { // Jackson / GSON сюди приходить в метод
-        UrlDTO urlDTO = new UrlDTO(); // create urlDTO
-        urlDTO.setUrl(url); // передаємо який юрл треба скоротити
 
-        String id = urlService.saveUrl2(urlDTO); // зберігаємо дтошку в базі
+       UrlRecord urlRecord = urlService.saveUrl2();
+       urlRecord.setUrl(url);
+       String shorturl = urlService.getRandomString(7);
+       urlRecord.setShortUrl(shorturl);
+       urlRepository.save(urlRecord);
+       UrlResultDTO urlResultDTO = new UrlResultDTO();
+       urlResultDTO.setUrl(url);
+       urlResultDTO.setShortUrl(shorturl);
 
-        UrlResultDTO result = new UrlResultDTO(); // новий обьект вже іншої дтошки
-        result.setUrl(urlDTO.getUrl()); // першому полю встановили значення що передавав юзер
-        result.setShortUrl(id); // другому полю передали id
-// в рест контроллері при повернені обьекту він автоматично серіалізується в джейсон формат
-        return result; // повертаємо id збереженого обьекту чи іншу дтошку з двома обьектами
+        return urlResultDTO; // повертаємо id збереженого обьекту чи іншу дтошку з двома обьектами
     }
 }

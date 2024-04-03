@@ -12,7 +12,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Setter
 @Getter
@@ -22,18 +21,20 @@ public class UrlRecord {
     @GeneratedValue
     private Long id;
 
-    @Column(nullable = false)
+  //  @Column(nullable = false)
     private String url; // long URL довгий урл
 
-    @Column(nullable = false)  // поле рахує скільки раз переходять за скороченим посиланням
+   // @Column(nullable = false)  // поле рахує скільки раз переходять за скороченим посиланням
     private Long count;
 
     @Temporal(value = TemporalType.TIMESTAMP) // каже базі як зберігати дату в базі - тільки час тільки дату чи все
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @Column(nullable = false)
+ //   @Column(nullable = false)
     private LocalDateTime lastAccess;
+
+    private String shortUrl;
 
     public UrlRecord() { // в конструкторах ініціалізуємо певні значення за замовчуванням
         count = 0L;

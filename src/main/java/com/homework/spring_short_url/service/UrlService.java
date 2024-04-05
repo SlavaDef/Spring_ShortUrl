@@ -2,7 +2,6 @@ package com.homework.spring_short_url.service;
 
 import com.homework.spring_short_url.controller.UrlController;
 import com.homework.spring_short_url.dto.UrlDTO;
-import com.homework.spring_short_url.dto.UrlResultDTO;
 import com.homework.spring_short_url.dto.UrlStatDTO;
 import com.homework.spring_short_url.models.UrlRecord;
 import com.homework.spring_short_url.repo.UrlRepository;
@@ -14,9 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 
@@ -30,41 +27,31 @@ public class UrlService {
     private static final Logger LOGGER = LogManager.getLogger(UrlController.class);
 
     private final UrlRepository urlRepository;
-// через конструктор інжект репозіторій з усіма методами
 
 
-    @Transactional
     // ініціалізується транзакція - виконується код якщо ексепшена нема то транзакція комит якщо є відкатується
-    public long saveUrl(UrlDTO urlDTO) {
-        UrlRecord urlRecord = urlRepository.findByUrl(urlDTO.getUrl()); // за довгим урл знайди запис в таблиці чи скорочували ми вже його
-        if (urlRecord == null) { // якщо такого нема то це новий
-            urlRecord = UrlRecord.of(urlDTO); // копіюємо в дто обьект і зберігаємо в базу запамятовуємо введений урл
-            LOGGER.info("urlRecordUrl = " + urlRecord.getUrl()); // довге посилання
-            LOGGER.info("urlRecordAccess = " + urlRecord.getLastAccess());
-            LOGGER.info("urlRecordId = " + urlRecord.getId()); // null
-            urlRepository.save(urlRecord);
+    @Transactional
+    public UrlRecord createUrl(String url) {
+        UrlRecord urlRecord = urlRepository.findByUrl(url);
+        if(urlRecord==null) {
+            urlRecord=new UrlRecord(url);
+            urlRecord.setShortUrl(getRandomString(7));
         }
-        LOGGER.info("urlRecordUrl = " + urlRecord.getUrl()); // довге посилання
-        LOGGER.info("urlRecordAccess = " + urlRecord.getLastAccess());
-        LOGGER.info("urlRecordId = " + urlRecord.getId()); // 1
-// присвоєний id використовуємо як унік індефікатор для короткого посилання
-        return urlRecord.getId(); // зберігаємо айди
+        urlRepository.save(urlRecord);
+        return urlRecord;
     }
 
-    @Transactional // завдяки цьому автокоміту всі зміни будеть показуватися в базі
-    //   public String getUrl(long id) { // тут навпаки по id хочу отримати довгий урл повертає опшинал(обькт) за id
-    public String getUrl(String link) {
-        Optional<UrlRecord> urlOpt = urlRepository.findByLink(link);
-    //    LOGGER.info("findByLink = " + urlOpt.get().getShortUrl());
-        //  Optional <UrlRecord>urlOpt = urlRepository.findByLink(link);
-        if (urlOpt.isEmpty())
-            return null;
+    @Transactional
+    public UrlRecord getUrl(String link) {
 
-        UrlRecord urlRecord = urlOpt.get(); // отримали цей обьект
-        urlRecord.setCount(urlRecord.getCount() + 1L); // збільшиои його каунт на 1
-        urlRecord.setLastAccess(LocalDateTime.now()); // встановили останню дату перегляду
+        UrlRecord urlRecord = urlRepository.findByShortUrl(link); // get entity by short link
 
-        return urlRecord.getUrl(); // повертаємо це довге посилання
+        LOGGER.info("findByLink = " + urlRecord);
+
+        urlRecord.setCount(urlRecord.getCount() + 1L); // count++
+        urlRecord.setLastAccess(LocalDateTime.now()); // set Last Access
+        urlRepository.save(urlRecord); // save in base ??? need or not?
+        return urlRecord; // return object
     }
 
     @Transactional(readOnly = true) // тут методи тільки читають з бази
@@ -75,16 +62,6 @@ public class UrlService {
         records.forEach(x -> result.add(x.toStatDTO())); // конвертуе в дто
 
         return result;
-    }
-
-
-    // ініціалізується транзакція - виконується код якщо ексепшена нема то транзакція комит якщо є відкатується
-    @Transactional
-    public UrlRecord saveUrl2() {
-        UrlDTO urlDTO = new UrlDTO();
-        UrlRecord urlRecord = UrlRecord.of(urlDTO);
-        urlRepository.save(urlRecord);
-        return urlRecord;
     }
 
     public List<UrlRecord> listAll() {

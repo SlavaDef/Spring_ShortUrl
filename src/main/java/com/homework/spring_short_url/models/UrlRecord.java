@@ -9,6 +9,7 @@ import com.homework.spring_short_url.dto.UrlDTO;
 import com.homework.spring_short_url.dto.UrlStatDTO;
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 @Setter
 @Getter
 @Entity
+@NoArgsConstructor
 public class UrlRecord {
     @Id
     @GeneratedValue
@@ -36,27 +38,25 @@ public class UrlRecord {
 
     private String shortUrl;
 
-    public UrlRecord() { // в конструкторах ініціалізуємо певні значення за замовчуванням
+    public UrlRecord(String url) { // в конструкторах ініціалізуємо певні значення за замовчуванням
         count = 0L;
         lastAccess = LocalDateTime.now();
+        this.url=url;
+        shortUrl="";
     }
 
-    public UrlRecord(String url) {
-        this();
-        this.url = url;
-    }
 
-    public static UrlRecord of(UrlDTO urlDTO) { // це метод який копіює данні з ентеті в дто
+   /* public static UrlRecord of(UrlDTO urlDTO) { // це метод який копіює данні з ентеті в дто
 
         return new UrlRecord(urlDTO.getUrl());
-    }
+    } */
 
 
     public UrlStatDTO toStatDTO() {
         UrlStatDTO result = new UrlStatDTO();
 
         result.setUrl(url); // копіюємо довгий url
-        result.setShortUrl(Long.toString(id));
+        result.setShortUrl(shortUrl);
         result.setRedirects(count);
         result.setLastAccess(lastAccess);
 

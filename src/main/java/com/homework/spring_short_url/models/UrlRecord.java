@@ -7,10 +7,7 @@ import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.homework.spring_short_url.dto.UrlStatDTO;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -19,14 +16,19 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @NoArgsConstructor
-//@Table(name = "url_record")
+@AllArgsConstructor
+@Table(name = "url_record")
 public class UrlRecord {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false)
     private String url; // long URL довгий урл
+
+    @Column(name = "short_url", nullable = false)
+    private String shortUrl;
 
     @Column(nullable = false)  // поле рахує скільки раз переходять за скороченим посиланням
     private Long count;
@@ -35,10 +37,9 @@ public class UrlRecord {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
-    @Column(nullable = false)
+    @Column(name = "last_access", nullable = false)
     private LocalDateTime lastAccess;
 
-    private String shortUrl;
 
     public UrlRecord(String url) { // в конструкторах ініціалізуємо певні значення за замовчуванням
         count = 0L;

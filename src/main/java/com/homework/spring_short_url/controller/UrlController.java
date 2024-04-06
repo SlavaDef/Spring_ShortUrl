@@ -89,20 +89,20 @@ public class UrlController {
         var existUrlrecord = urlService.getById(id);
         if (existUrlrecord != null) {
             this.urlService.deleteUrlRecord(existUrlrecord);
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok("deleted successfully!.");
         }
         return ResponseEntity.notFound().build();
     }
 
     // delete entity by short link request - DELETE http://localhost:8080/deleteByLink/gfcGHlv
     @DeleteMapping("/deleteByLink/{link}")
-    public ResponseEntity<String> deleteUr(@PathVariable("link") String link) {
+    public ResponseEntity<UrlRecord> deleteUr(@PathVariable("link") String link) {
 
       UrlRecord urlRecord =  urlService.deleteUrlByShortLink(link) ;
      if (urlRecord != null) {
-         return new ResponseEntity<>(HttpStatus.OK);
+         return new ResponseEntity<>(urlRecord, HttpStatus.OK);
      }
-     return ResponseEntity.notFound().build();
+        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
 

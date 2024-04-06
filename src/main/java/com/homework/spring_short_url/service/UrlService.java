@@ -85,6 +85,7 @@ public class UrlService {
     @Transactional
     public UrlRecord deleteUrlByShortLink(String link) {
        UrlRecord urlRecord = urlRepository.findByShortUrl(link);
+       log.info(urlRecord.getShortUrl());
         urlRepository.delete(
                 urlRecord);
         return urlRecord;

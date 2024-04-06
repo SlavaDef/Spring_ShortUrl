@@ -1,11 +1,12 @@
 package com.homework.spring_short_url.service;
 
 import com.homework.spring_short_url.controller.UrlController;
-import com.homework.spring_short_url.dto.UrlDTO;
 import com.homework.spring_short_url.dto.UrlStatDTO;
 import com.homework.spring_short_url.models.UrlRecord;
 import com.homework.spring_short_url.repo.UrlRepository;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -14,13 +15,16 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 
 // DB -> Enteti(20) -> Repo -> Service -> DTO <- Controller -> View / JSON (5)
 // ідея наступна - не завжди треба всі поля ентеті, тому поля конвертують у дто а з них вже у контроллер
 //  дто це звичайні класи в які ми копіюємо данні з ентеті які нам потрібні
-@AllArgsConstructor
+//@AllArgsConstructor
+@Slf4j
+@RequiredArgsConstructor
 @Service // анотація похідна від компоненту в рантаймі створюється автоматично реалізує логіку по верх репозитирія
 public class UrlService {
 
@@ -33,8 +37,8 @@ public class UrlService {
     @Transactional
     public UrlRecord createUrl(String url) {
         UrlRecord urlRecord = urlRepository.findByUrl(url);
-        if(urlRecord==null) {
-            urlRecord=new UrlRecord(url);
+        if (urlRecord == null) {
+            urlRecord = new UrlRecord(url);
             urlRecord.setShortUrl(getRandomString(7));
         }
         urlRepository.save(urlRecord);
@@ -64,6 +68,7 @@ public class UrlService {
         return result;
     }
 
+    @Transactional
     public List<UrlRecord> listAll() {
         return urlRepository.findAll();
     }
@@ -75,6 +80,26 @@ public class UrlService {
             s.append(AlphaNumericStr.charAt(ThreadLocalRandom.current().nextInt(AlphaNumericStr.length())));
         }
         return s.toString();
+    }
+
+    @Transactional
+    public UrlRecord deleteUrlByShortLink(String link) {
+       UrlRecord urlRecord = urlRepository.findByShortUrl(link);
+        urlRepository.delete(
+                urlRecord);
+        return urlRecord;
+    }
+
+    @Transactional
+    public void deleteUrlRecord(UrlRecord urlRecord) {
+        urlRepository.delete(urlRecord);
+
+    }
+
+    @Transactional
+    public UrlRecord getById(Long id) {
+        return urlRepository.findById(id)
+                .orElseThrow(IllegalStateException::new);
     }
 
 }

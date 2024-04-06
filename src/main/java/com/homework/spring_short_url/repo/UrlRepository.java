@@ -14,4 +14,6 @@ public interface UrlRepository extends JpaRepository<UrlRecord, Long> {
     // якщо вірно назвати то данний метод спрінг рахує як урл ( String url - парами запиту)
 
     UrlRecord findByShortUrl(String shortUrl);
+
+  //  void delete(Optional<UrlRecord> urlRecord);
 }

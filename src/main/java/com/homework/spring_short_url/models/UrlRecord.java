@@ -5,35 +5,37 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
-import com.homework.spring_short_url.dto.UrlDTO;
 import com.homework.spring_short_url.dto.UrlStatDTO;
 import jakarta.persistence.*;
+import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Setter
-@Getter
+//@Setter
+//@Getter
+@Data
 @Entity
 @NoArgsConstructor
+//@Table(name = "url_record")
 public class UrlRecord {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-  //  @Column(nullable = false)
+    @Column(nullable = false)
     private String url; // long URL довгий урл
 
-   // @Column(nullable = false)  // поле рахує скільки раз переходять за скороченим посиланням
+    @Column(nullable = false)  // поле рахує скільки раз переходять за скороченим посиланням
     private Long count;
 
     @Temporal(value = TemporalType.TIMESTAMP) // каже базі як зберігати дату в базі - тільки час тільки дату чи все
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd.MM.yyyy HH:mm")
     @JsonDeserialize(using = LocalDateTimeDeserializer.class)
     @JsonSerialize(using = LocalDateTimeSerializer.class)
- //   @Column(nullable = false)
+    @Column(nullable = false)
     private LocalDateTime lastAccess;
 
     private String shortUrl;
@@ -51,10 +53,8 @@ public class UrlRecord {
         return new UrlRecord(urlDTO.getUrl());
     } */
 
-
     public UrlStatDTO toStatDTO() {
         UrlStatDTO result = new UrlStatDTO();
-
         result.setUrl(url); // копіюємо довгий url
         result.setShortUrl(shortUrl);
         result.setRedirects(count);

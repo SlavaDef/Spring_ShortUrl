@@ -5,6 +5,8 @@ import com.homework.spring_short_url.dto.UrlStatDTO;
 import com.homework.spring_short_url.models.UrlRecord;
 import com.homework.spring_short_url.service.UrlService;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpHeaders;
@@ -14,8 +16,12 @@ import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
-@AllArgsConstructor
+
+@Slf4j // анагог логера клас прописувати не треба
+//@AllArgsConstructor
+@RequiredArgsConstructor
 @RestController
 public class UrlController {
 
@@ -36,8 +42,9 @@ public class UrlController {
 
         UrlResultDTO urlResultDTO = new UrlResultDTO();
         urlResultDTO.setUrl(url);
-        urlResultDTO.setShortUrl(urlRecord.getShortUrl());
 
+        urlResultDTO.setShortUrl(urlRecord.getShortUrl());
+        log.info("Result Dto is created!!!!");
         return urlResultDTO; // return ResultDto in which we copy url and shortlink
     }
 
@@ -46,7 +53,7 @@ public class UrlController {
 
         String url = urlService.getUrl(link).getUrl();
 
-        LOGGER.info("url = "+ url);
+        LOGGER.info("url = " + url);
         HttpHeaders headers = new HttpHeaders();
         headers.setLocation(URI.create(url));
         headers.setCacheControl("no-cache, no-store, must-revalidate"); // це відрубити кушування в браузері
@@ -75,5 +82,28 @@ public class UrlController {
     public List<UrlRecord> all() {
         return urlService.listAll();
     }
+
+    // delete entity by id request - DELETE http://localhost:8080/delete/2
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<String> delete(@PathVariable("id") Long id) {
+        var existUrlrecord = urlService.getById(id);
+        if (existUrlrecord != null) {
+            this.urlService.deleteUrlRecord(existUrlrecord);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    // delete entity by short link request - DELETE http://localhost:8080/deleteByLink/gfcGHlv
+    @DeleteMapping("/deleteByLink/{link}")
+    public ResponseEntity<String> deleteUr(@PathVariable("link") String link) {
+
+      UrlRecord urlRecord =  urlService.deleteUrlByShortLink(link) ;
+     if (urlRecord != null) {
+         return new ResponseEntity<>(HttpStatus.OK);
+     }
+     return ResponseEntity.notFound().build();
+    }
+
 
 }

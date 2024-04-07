@@ -105,5 +105,15 @@ public class UrlController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
+    @DeleteMapping("/deleteShortLink/{id}")
+    public ResponseEntity<String> deleteShort(@PathVariable("id") Long id) {
+        var existUrlrecord = urlService.getById(id);
+        if (existUrlrecord != null) {
+            this.urlService.deleteShortUrl(id);
+            return ResponseEntity.ok("Deleted successfully!.");
+        }
+        return ResponseEntity.notFound().build();
+    }
+
 
 }

@@ -100,6 +100,13 @@ public class UrlService {
 
     }
 
+    public void deleteShortUrl(Long id) {
+      UrlRecord urlRecord =  urlRepository.findById(id).isPresent() ? urlRepository.findById(id).get() : null;
+        assert urlRecord != null;
+        urlRecord.setShortUrl("");
+      urlRepository.save(urlRecord);
+    }
+
     @Transactional
     public UrlRecord getById(Long id) {
         return urlRepository.findById(id)

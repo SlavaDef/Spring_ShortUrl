@@ -9,6 +9,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,7 @@ import java.util.concurrent.ThreadLocalRandom;
 //@AllArgsConstructor
 @Slf4j
 @RequiredArgsConstructor
+@EnableAsync
 @Service // анотація похідна від компоненту в рантаймі створюється автоматично реалізує логіку по верх репозитирія
 public class UrlService {
 
@@ -84,10 +88,9 @@ public class UrlService {
 
     @Transactional
     public UrlRecord deleteUrlByShortLink(String link) {
-       UrlRecord urlRecord = urlRepository.findByShortUrl(link);
-       log.info(urlRecord.getShortUrl());
-        urlRepository.delete(
-                urlRecord);
+        UrlRecord urlRecord = urlRepository.findByShortUrl(link);
+        log.info(urlRecord.getShortUrl());
+        urlRepository.delete(urlRecord);
         return urlRecord;
     }
 
@@ -101,6 +104,21 @@ public class UrlService {
     public UrlRecord getById(Long id) {
         return urlRepository.findById(id)
                 .orElseThrow(IllegalStateException::new);
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 18 07 * ?", zone = "Europe/Kiev")
+    @Async
+    void deleteOldUrlRecords() {
+
+        List<UrlRecord> list = urlRepository.findAll();
+        for (UrlRecord urlRecord : list) {
+            if (urlRecord.getLastAccess().compareTo(LocalDateTime.now()) < 0) {
+                urlRecord.setShortUrl("");
+            }
+        }
+        log.info("The old shortLink has been deleted.");
+
     }
 
 }

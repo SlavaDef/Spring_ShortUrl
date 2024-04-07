@@ -89,7 +89,7 @@ public class UrlController {
         var existUrlrecord = urlService.getById(id);
         if (existUrlrecord != null) {
             this.urlService.deleteUrlRecord(existUrlrecord);
-            return ResponseEntity.ok("deleted successfully!.");
+            return ResponseEntity.ok("Deleted successfully!.");
         }
         return ResponseEntity.notFound().build();
     }

@@ -41,7 +41,7 @@ public class UrlService {
     @Transactional
     public UrlRecord createUrl(String url) {
         UrlRecord urlRecord = urlRepository.findByUrl(url);
-        if (urlRecord == null) {
+        if (urlRecord == null || urlRecord.getShortUrl() == null) {
             urlRecord = new UrlRecord(url);
             urlRecord.setShortUrl(getRandomString(7));
         }
